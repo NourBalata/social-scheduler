@@ -17,7 +17,7 @@ class FacebookController extends Controller
 
     public function redirect()
     {
-        // حقن البيانات ديناميكياً كما فعلتِ سابقاً
+        
         config([
             'services.facebook.client_id' => session('fb_client_id'),
             'services.facebook.client_secret' => session('fb_client_secret'),
@@ -54,7 +54,7 @@ class FacebookController extends Controller
         [
             'name' => 'Facebook User', 
             'access_token' => $userToken,
-            'token_expires_at' => now()->addDays(60), // التوكن الطويل بضل شهرين
+            'token_expires_at' => now()->addDays(60), 
         ]
     );
 
@@ -74,6 +74,6 @@ class FacebookController extends Controller
         }
     }
 
-    return redirect()->route('dashboard')->with('success', 'تم ربط الحساب بنجاح وتفعيل توكن طويل الأمد!');
+    return redirect()->route('dashboard')->with('success', 'تم ربط  الحساب');
 }
 }

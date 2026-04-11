@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
    
         ]);
         \App\Models\User::updateOrCreate(
-        ['email' => 'nour@admin.com'], // إيميل الأدمن الثابت
+        ['email' => 'nour@admin.com'], 
         [
             'name' => 'Admin Nour',
             'password' => Hash::make('123456789'), 

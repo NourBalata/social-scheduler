@@ -10,7 +10,7 @@ class StorePostRequest extends FormRequest
         return [
             'facebook_page_id' => 'required|exists:facebook_pages,id',
             'content' => 'required|string|max:5000',
-            'scheduled_at' => 'required|date|after:now', // لازم يكون في المستقبل
+            'scheduled_at' => 'required|date|after:now',
         ];
     }
 }

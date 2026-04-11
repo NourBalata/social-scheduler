@@ -14,7 +14,7 @@ class PublishScheduledPosts extends Command
 
     public function handle()
     {
-        $this->info('--- بدء عملية فحص المنشورات ---');
+        $this->info(' بدء عملية فحص المنشورات ');
         
         $now = now();
         $this->line("توقيت السيرفر الحالي: {$now}");
@@ -40,7 +40,7 @@ class PublishScheduledPosts extends Command
             $this->publishPost($post);
         }
 
-        $this->info('--- انتهت عملية المعالجة ---');
+        $this->info('انتهت عملية المعالجة');
     }
 
     private function publishPost(ScheduledPost $post)
@@ -109,7 +109,7 @@ class PublishScheduledPosts extends Command
             }
 
         } catch (\Exception $e) {
-            $this->error("❌ فشل النشر: {$e->getMessage()}");
+            $this->error("فشل النشر: {$e->getMessage()}");
             
             $post->update([
                 'status' => 'failed',

@@ -21,7 +21,7 @@ class AdminUserController extends Controller
 {
     $user = auth()->user();
 
-    // إذا كان أدمن: جلب كل البيانات
+  
     if ($user->is_admin) {
         $users = \App\Models\User::where('is_admin', false)->get();
         $plans = \App\Models\Plan::all();
@@ -52,7 +52,7 @@ public function store(Request $request)
         'is_admin' => false,
     ]);
 
-    // إذا كان الطلب Ajax بنرجع JSON
+  
     if ($request->ajax()) {
         return response()->json([
             'success' => true,
@@ -81,7 +81,7 @@ public function store(Request $request)
 //        'plan_id' => $request->plan_id,
 //             'fb_client_id' => $request->fb_client_id,
 //             'fb_client_secret' => $request->fb_client_secret,
-//             'is_admin' => false, // دايماً false لأنه مشترك
+//             'is_admin' => false, //
 //         ]);
 // // dd($request->plan_id);
 // dd($request->all());

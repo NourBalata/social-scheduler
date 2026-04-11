@@ -24,7 +24,7 @@ class ScheduledPost extends Model
         'media' => 'array',
         'scheduled_at' => 'datetime',
         'published_at' => 'datetime',
-        'status' => 'string', // عشان نضمن المعاملة كـ string دايماً
+        'status' => 'string',
     ];
 
     public function user(): BelongsTo
@@ -37,7 +37,6 @@ class ScheduledPost extends Model
         return $this->belongsTo(FacebookPage::class);
     }
 
-    // --- Actions ---
 
     public function markAsPublished(string $fbPostId): void
     {
@@ -52,11 +51,9 @@ class ScheduledPost extends Model
     {
         $this->update([
             'status' => 'failed',
-            'error_message' => substr($error, 0, 1000), // أمان: عشان ما يضرب الـ String limit لو الخطأ طويل
+            'error_message' => substr($error, 0, 1000), 
         ]);
     }
-
-    // --- Scopes ---
 
     public function scopePending(Builder $query): Builder
     {

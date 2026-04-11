@@ -12,12 +12,12 @@ class CheckFacebookTokens extends Command
 
     public function handle()
     {
-        $this->info('--- فحص حالة Facebook Tokens ---');
+        $this->info('فحص حالة Facebook Tokens');
         
         $pages = FacebookPage::with('user')->get();
         
         if ($pages->isEmpty()) {
-            $this->warn('  لا توجد صفحات Facebook مربوطة');
+            $this->warn('لا توجد صفحات Facebook مربوطة');
             return;
         }
 

@@ -9,9 +9,9 @@ class PlanSeeder extends Seeder
 {
     public function run()
     {
-        // خطة Free
+        //  Free
         Plan::updateOrCreate(
-            ['slug' => 'free'], // المفتاح اللي بنشيك عليه (لو موجود ما بكرره)
+            ['slug' => 'free'], 
             [
                 'name' => 'Free',
                 'price' => 0,
@@ -21,7 +21,7 @@ class PlanSeeder extends Seeder
             ]
         );
 
-        // خطة Pro
+        //  Pro
         Plan::updateOrCreate(
             ['slug' => 'pro'],
             [
@@ -33,7 +33,7 @@ class PlanSeeder extends Seeder
             ]
         );
 
-        // خطة Enterprise
+        //  Enterprise
         Plan::updateOrCreate(
             ['slug' => 'enterprise'],
             [

@@ -9,15 +9,12 @@ class PlanController extends Controller
 {
   public function index()
 {
-    // 1. جلب كل الخطط المفعلة
+    
     $plans = Plan::where('active', true)->get();
 
-    // 2. جلب المستخدم الأول (بما أننا في مرحلة التطوير وبدون لوجن)
+
     $user = \App\Models\User::first();
 
-    // 3. تحديد الخطة الحالية: 
-    // إذا وجد مستخدم، نأخذ خطته. 
-    // إذا لم يوجد مستخدم أو لم يكن له خطة، نأخذ الخطة المجانية كقيمة افتراضية.
     $currentPlan = $user?->plan ?? Plan::where('slug', 'free')->first();
 
     return view('plans.index', compact('plans', 'currentPlan'));
@@ -37,8 +34,7 @@ class PlanController extends Controller
                 ->with('success', 'Subscribed to Free plan');
         }
 
-        // هون لازم يكون في payment gateway
-        // بس هلا نحطها مؤقت
+      
         $user->update([
             'plan_id' => $plan->id,
             'plan_expires_at' => now()->addMonth()

@@ -26,7 +26,7 @@ class User extends Authenticatable
         'is_admin'          => 'boolean',
     ];
 
-    // --- Relations ---
+
 
     public function currentPlan(): BelongsTo
     {
@@ -48,7 +48,7 @@ class User extends Authenticatable
         return $this->hasMany(ScheduledPost::class);
     }
 
-    // --- SaaS Logic ---
+
 
     public function hasActivePlan(): bool
     {
@@ -63,7 +63,7 @@ class User extends Authenticatable
 
     public function canSchedulePost(): bool
     {
-        // تم التعديل لاستخدام currentPlan بدلاً من plan
+       
         if (!$this->hasActivePlan() || !$this->currentPlan) {
             return false;
         }
@@ -90,7 +90,7 @@ class User extends Authenticatable
 
     public function canAddPage(): bool
     {
-        // تم التعديل هنا أيضاً لاستخدام currentPlan
+       
         if (!$this->hasActivePlan() || !$this->currentPlan) return false;
 
         return $this->pages()->count() < $this->currentPlan->pages_limit;

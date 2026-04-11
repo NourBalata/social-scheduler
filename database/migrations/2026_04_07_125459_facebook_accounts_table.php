@@ -13,22 +13,14 @@ return new class extends Migration
     {
         Schema::create('facebook_accounts', function (Blueprint $table) {
             $table->id();
-            
-            // ربط الحساب بمستخدم النظام عندنا
             $table->foreignId('user_id')
                   ->constrained()
                   ->cascadeOnDelete();
-
-            // البيانات اللي بتيجي من فيسبوك
-            $table->string('facebook_id')->unique(); // ID المستخدم عند فيسبوك
-            $table->string('name'); // اسمه الكامل على فيسبوك
-            $table->string('email')->nullable(); // إيميله (لو احتجناه للتواصل)
-            $table->string('avatar')->nullable(); // رابط صورته الشخصية
-
-            // أهم جزء: التوكن الأساسي (User Access Token)
+            $table->string('facebook_id')->unique(); 
+            $table->string('name'); 
+            $table->string('email')->nullable(); 
+            $table->string('avatar')->nullable();
             $table->text('access_token'); 
-            
-            // متى بنتهي التوكن (الـ Long-lived عادة بكون 60 يوم)
             $table->timestamp('token_expires_at')->nullable();
 
             $table->timestamps();

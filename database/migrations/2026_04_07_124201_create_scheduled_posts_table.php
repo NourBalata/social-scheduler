@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('facebook_page_id')->constrained()->cascadeOnDelete();
             $table->text('content');
-            $table->json('media')->nullable(); // [{'type': 'image', 'path': '...'}]
+            $table->json('media')->nullable(); 
             $table->timestamp('scheduled_at');
             $table->enum('status', ['pending', 'published', 'failed'])->default('pending');
             $table->string('facebook_post_id')->nullable();

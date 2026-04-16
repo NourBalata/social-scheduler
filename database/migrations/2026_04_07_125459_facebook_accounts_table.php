@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('facebook_accounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+            $table->foreignId('user_id') ->constrained()->cascadeOnDelete();
             $table->string('facebook_id')->unique(); 
             $table->string('name'); 
             $table->string('email')->nullable(); 

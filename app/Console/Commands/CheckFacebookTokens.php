@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 class CheckFacebookTokens extends Command
 {
-    protected $signature = 'fb:check-tokens';
+    protected $signature = 'facebook:check-tokens';
     protected $description = 'Check tokens status';
 
     public function handle()

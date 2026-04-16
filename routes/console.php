@@ -10,6 +10,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 
-Schedule::command('posts:publish')
-    ->everyMinute()
-    ->withoutOverlapping();
+Schedule::command('posts:publish') ->everyMinute()->withoutOverlapping();

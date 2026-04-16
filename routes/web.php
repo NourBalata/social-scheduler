@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/facebook/callback', [FacebookController::class, 'callback'])->name('facebook.callback');
 });
 
-Route::post('/my/pages/store', [PostController::class, 'store2'])
-    ->name('pages.store2')
-    ->middleware('auth');
+Route::post('/pages', [PostController::class, 'store2'])->name('pages.store2')->middleware('auth');
+
+
 require __DIR__.'/auth.php';

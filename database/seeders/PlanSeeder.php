@@ -9,7 +9,7 @@ class PlanSeeder extends Seeder
 {
     public function run()
     {
-        //  Free
+    
         Plan::updateOrCreate(
             ['slug' => 'free'], 
             [
@@ -20,8 +20,6 @@ class PlanSeeder extends Seeder
                 'active' => true
             ]
         );
-
-        //  Pro
         Plan::updateOrCreate(
             ['slug' => 'pro'],
             [
@@ -32,8 +30,6 @@ class PlanSeeder extends Seeder
                 'active' => true
             ]
         );
-
-        //  Enterprise
         Plan::updateOrCreate(
             ['slug' => 'enterprise'],
             [

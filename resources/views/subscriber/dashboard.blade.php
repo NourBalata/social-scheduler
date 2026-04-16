@@ -186,35 +186,35 @@
             </button>
         </div>
 
-        <form action="{{ route('admin.users.store') }}" method="POST" class="p-6 space-y-4">
-            @csrf
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Page ID</label>
-                <input type="text" name="page_id" placeholder="مثال: 123456789..."
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">اسم الصفحة</label>
-                <input type="text" name="page_name" placeholder="اسم الصفحة..."
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Page Access Token</label>
-                <input type="text" name="page_access_token" placeholder="EAAW..."
-                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
-            </div>
+     <form action="{{ route('pages.store2') }}" method="POST" class="p-6 space-y-4">
+    @csrf
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Page ID</label>
+        <input type="text" name="page_id" placeholder="مثال: 123456789..."
+               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">اسم الصفحة</label>
+        <input type="text" name="page_name" placeholder="اسم الصفحة..."
+               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Page Access Token</label>
+        <input type="text" name="page_access_token" placeholder="EAAW..."
+               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
 
-            <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
-                <button type="submit"
-                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-                    حفظ الصفحة
-                </button>
-                <button type="button" id="cancelPageModalBtn"
-                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                    إلغاء
-                </button>
-            </div>
-        </form>
+    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+        <button type="submit"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+            حفظ الصفحة
+        </button>
+        <button type="button" id="cancelPageModalBtn"
+                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+            إلغاء
+        </button>
+    </div>
+</form>
     </div>
 </div>
      <script>

@@ -24,7 +24,7 @@ class PostController extends Controller
         if (!$page) {
             return back()
                 ->withInput()
-                ->withErrors(['page_name' => 'الصفحة غير موجودة، تأ']);
+                ->withErrors(['page_name' => 'غير موجودة الصفحة']);
         }
 
         $post = ScheduledPost::create([
@@ -35,6 +35,24 @@ class PostController extends Controller
             'status'           => 'pending',
         ]);
 
-        return back()->with('success', "✅ تم جدولة المنشور  بنجاح!");
+        return back()->with('success', "تم.");
     }
+
+public function store2(Request $request)
+{
+    $request->validate([
+        'page_id'           => 'required|string',
+        'page_name'         => 'required|string',
+        'page_access_token' => 'required|string',
+    ]);
+    auth()->user()->facebookPages()->create([
+        'page_id'          => $request->page_id,
+        'page_name'        => $request->page_name,
+        'access_token'     => $request->page_access_token,
+        'is_active'        => true,
+        'token_expires_at' => now()->addDays(60),
+    ]);
+
+    return back()->with('success', 'تم.');
+}
 }

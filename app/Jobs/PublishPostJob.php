@@ -24,12 +24,11 @@ class PublishPostJob implements ShouldQueue
     }
     public function handle(SocialMediaProvider $facebookService): void
     {
-    // حماية التكرار
         if ($this->post->status !== 'pending') return;
 
         try {
           
-            $page = $this->post->facebookPage;
+          $page = $this->post->facebookPage;
 
             if (!$page || !$page->isTokenValid()) {
                 throw new Exception(" غير صالح.");

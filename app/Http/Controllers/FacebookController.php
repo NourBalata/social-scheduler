@@ -29,12 +29,12 @@ class FacebookController extends Controller
         }
 
         try {
-            // 1. جلب الـ Access Token الأولي
+
             $tokenData = $this->socialService->getAccessToken($request->code);
 
         dd($tokenData);
             if (empty($tokenData['access_token'])) {
-                return redirect()->route('dashboard')->with('error', 'فشل في الحصول على Access Token.');
+                return redirect()->route('dashboard')->with('error', 'فشل  Access Token.');
             }
 
             $shortToken = $tokenData['access_token'];
@@ -51,7 +51,7 @@ class FacebookController extends Controller
                 ? ($longRes->json('access_token') ?? $shortToken) 
                 : $shortToken;
 
-            // 3. حفظ أو تحديث حساب فيسبوك الأساسي للمستخدم
+      
             $account = Auth::user()->facebookAccounts()->updateOrCreate(
                 ['facebook_id' => $tokenData['user_id'] ?? null],
                 [
@@ -61,22 +61,18 @@ class FacebookController extends Controller
                 ]
             );
 
-            // 4. جلب الصفحات التي يديرها هذا المستخدم
             $pages = $this->socialService->getUserPages($userToken);
 
             if (empty($pages)) {
-                return redirect()->route('dashboard')->with('warning', 'تم ربط الحساب بنجاح، لكن لم يتم العثور على صفحات.');
+                return redirect()->route('dashboard')->with('warning', 'تم لكن لا توجد صفحات');
             }
 
             $user = Auth::user();
             $linkedCount = 0;
 
-            // 5. معالجة الصفحات وحفظها
-         // داخل الـ foreach في ملف FacebookController.php
 
-// حطي الـ dd هان بالظبط
 // dd($pages);
-// ✅ هيك صح
+
 foreach ($pages as $pageData) {
     if (empty($pageData['id']) || empty($pageData['access_token'])) {
         continue;
@@ -99,7 +95,7 @@ foreach ($pages as $pageData) {
     $linkedCount++;
 }
 
-            return redirect()->route('dashboard')->with('success', "تم ربط الحساب وجلب {$linkedCount} صفحات بنجاح.");
+            return redirect()->route('dashboard')->with('success', "تم .");
 
         } catch (\Exception $e) {
             Log::error('Facebook callback error', [
@@ -107,7 +103,7 @@ foreach ($pages as $pageData) {
                 'error'   => $e->getMessage(),
                 'trace'   => $e->getTraceAsString()
             ]);
-            return redirect()->route('dashboard')->with('error', 'حدث خطأ أثناء ربط الحساب: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('error', 'حدث خطأ : ' . $e->getMessage());
         }
     }
 }

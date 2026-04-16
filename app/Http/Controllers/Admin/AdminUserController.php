@@ -35,103 +35,47 @@ class AdminUserController extends Controller
     }
 
 }
-// public function store(Request $request)
-// {
-//     $request->validate([
-//         'name' => 'required|string',
-//         'email' => 'required|email|unique:users',
-//         'password' => 'required',
-//         'plan_id' => 'required|exists:plans,id',
-        
-//     ]);
-
-//     $user = User::create([
-//     'name'             => $request->name,
-//     'email'            => $request->email,
-//     'password'         => Hash::make($request->password),
-//     'plan_id'          => $request->plan_id,
-//     'fb_user_id'       => $request->fb_user_id,
-//     'fb_access_token'  => $request->fb_access_token,
-//     'fb_client_id'     => $request->fb_client_id,
-//     'fb_client_secret' => $request->fb_client_secret,
-//     'is_admin'         => false,
-// ]);
-// if ($request->filled('page_id') && $request->filled('page_access_token')) {
-//     \App\Models\FacebookPage::create([
-//         'user_id'          => $user->id,
-//         'page_id'          => $request->page_id,
-//         'page_name'        => $request->page_name ?? 'صفحة بدون اسم',
-//         'access_token'     => $request->page_access_token,
-//         'is_active'        => true,
-//         'token_expires_at' => now()->addDays(60),
-//     ]);
-// }
-  
-//     if ($request->ajax()) {
-//         return response()->json([
-//             'success' => true,
-//             'user' => $user,
-//             'plan_name' => $user->currentPlan?->name ?? 'بدون خطة'
-//         ]);
-//     }
-
-//     return back()->with('success', 'تمت الإضافة');
-// }
-
 public function store(Request $request)
 {
-    // 1. الفاليديشن
     $request->validate([
         'name' => 'required|string',
         'email' => 'required|email|unique:users',
         'password' => 'required',
         'plan_id' => 'required|exists:plans,id',
+        
     ]);
 
-    try {
-        return \DB::transaction(function () use ($request) {
-            
-            // 2. حفظ اليوزر
-            $user = User::create([
-                'name'             => $request->name,
-                'email'            => $request->email,
-                'password'         => Hash::make($request->password),
-                'plan_id'          => $request->plan_id,
-                'fb_user_id'       => $request->fb_user_id,
-                'fb_access_token'  => $request->fb_access_token,
-                'fb_client_id'     => $request->fb_client_id,
-                'fb_client_secret' => $request->fb_client_secret,
-                'is_admin'         => false,
-            ]);
-
-            // 3. حفظ الصفحة (فقط إذا كانت البيانات موجودة)
-            if ($request->filled('page_id') && $request->filled('page_access_token')) {
-                $user->facebookPages()->create([ // استخدام العلاقة أفضل وأنظف
-                    'page_id'          => $request->page_id,
-                    'page_name'        => $request->page_name ?? 'صفحة بدون اسم',
-                    'access_token'     => $request->page_access_token,
-                    'is_active'        => true,
-                    'token_expires_at' => now()->addDays(60),
-                ]);
-            }
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'success'   => true,
-                    'user'      => $user,
-                    'plan_name' => $user->currentPlan?->name ?? 'بدون خطة'
-                ]);
-            }
-
-            return back()->with('success', 'تمت إضافة المشترك والصفحة بنجاح');
-        });
-        
-    } catch (\Exception $e) {
-        if ($request->ajax()) {
-            return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
-        }
-        return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+    $user = User::create([
+    'name'             => $request->name,
+    'email'            => $request->email,
+    'password'         => Hash::make($request->password),
+    'plan_id'          => $request->plan_id,
+    'fb_user_id'       => $request->fb_user_id,
+    'fb_access_token'  => $request->fb_access_token,
+    'fb_client_id'     => $request->fb_client_id,
+    'fb_client_secret' => $request->fb_client_secret,
+    'is_admin'         => false,
+]);
+if ($request->filled('page_id') && $request->filled('page_access_token')) {
+    \App\Models\FacebookPage::create([
+        'user_id'          => $user->id,
+        'page_id'          => $request->page_id,
+        'page_name'        => $request->page_name ?? 'صفحة بدون اسم',
+        'access_token'     => $request->page_access_token,
+        'is_active'        => true,
+        'token_expires_at' => now()->addDays(60),
+    ]);
+}
+  
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+            'plan_name' => $user->currentPlan?->name ?? 'بدون خطة'
+        ]);
     }
+
+    return back()->with('success', 'تمت الإضافة');
 }
 //     public function store(Request $request)
 //     {

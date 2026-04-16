@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Contracts\SocialMediaProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class FacebookController extends Controller
 {
@@ -17,63 +19,95 @@ class FacebookController extends Controller
 
     public function redirect()
     {
-        
-        config([
-            'services.facebook.client_id' => session('fb_client_id'),
-            'services.facebook.client_secret' => session('fb_client_secret'),
-            'services.facebook.redirect' => url('/auth/facebook/callback'),
-        ]);
-
         return redirect()->away($this->socialService->getAuthUrl());
     }
 
-  public function callback(Request $request)
-{
-    if ($request->has('error')) {
-        return redirect()->route('dashboard')->with('error', 'رفضت الدخول!');
+    public function callback(Request $request)
+    {
+        if ($request->has('error')) {
+            return redirect()->route('dashboard')->with('error', 'رفضت الدخول!');
+        }
+
+        try {
+            // 1. جلب الـ Access Token الأولي
+            $tokenData = $this->socialService->getAccessToken($request->code);
+
+        dd($tokenData);
+            if (empty($tokenData['access_token'])) {
+                return redirect()->route('dashboard')->with('error', 'فشل في الحصول على Access Token.');
+            }
+
+            $shortToken = $tokenData['access_token'];
+
+            // 2. تحويل التوكن لـ long-lived token (60 يوم) لضمان عدم توقفه فجأة
+            $longRes = Http::get('https://graph.facebook.com/v18.0/oauth/access_token', [
+                'grant_type'        => 'fb_exchange_token',
+                'client_id'         => config('services.facebook.client_id'),
+                'client_secret'     => config('services.facebook.client_secret'),
+                'fb_exchange_token' => $shortToken,
+            ]);
+
+            $userToken = $longRes->successful() 
+                ? ($longRes->json('access_token') ?? $shortToken) 
+                : $shortToken;
+
+            // 3. حفظ أو تحديث حساب فيسبوك الأساسي للمستخدم
+            $account = Auth::user()->facebookAccounts()->updateOrCreate(
+                ['facebook_id' => $tokenData['user_id'] ?? null],
+                [
+                    'name'             => 'Facebook User',
+                    'access_token'     => $userToken,
+                    'token_expires_at' => now()->addDays(60),
+                ]
+            );
+
+            // 4. جلب الصفحات التي يديرها هذا المستخدم
+            $pages = $this->socialService->getUserPages($userToken);
+
+            if (empty($pages)) {
+                return redirect()->route('dashboard')->with('warning', 'تم ربط الحساب بنجاح، لكن لم يتم العثور على صفحات.');
+            }
+
+            $user = Auth::user();
+            $linkedCount = 0;
+
+            // 5. معالجة الصفحات وحفظها
+         // داخل الـ foreach في ملف FacebookController.php
+
+// حطي الـ dd هان بالظبط
+// dd($pages);
+// ✅ هيك صح
+foreach ($pages as $pageData) {
+    if (empty($pageData['id']) || empty($pageData['access_token'])) {
+        continue;
     }
 
-    
-    $tokenData = $this->socialService->getAccessToken($request->code);
-    $userToken = $tokenData['access_token'];
-
-    $response = \Illuminate\Support\Facades\Http::get("https://graph.facebook.com/v18.0/oauth/access_token", [
-        'grant_type' => 'fb_exchange_token',
-        'client_id' => config('services.facebook.client_id'),
-        'client_secret' => config('services.facebook.client_secret'),
-        'fb_exchange_token' => $userToken,
-    ]);
-
-    if ($response->successful()) {
-        $userToken = $response->json()['access_token'] ?? $userToken;
-    }
-
-    
-    $account = Auth::user()->facebookAccounts()->updateOrCreate(
-        ['facebook_id' => $tokenData['user_id']],
+    \App\Models\FacebookPage::updateOrCreate(
         [
-            'name' => 'Facebook User', 
-            'access_token' => $userToken,
-            'token_expires_at' => now()->addDays(60), 
+            'page_id' => (string) $pageData['id'],
+            'user_id' => $user->id,
+        ], 
+        [
+            'page_name'           => $pageData['name'],
+            'facebook_account_id' => $account->id,
+            'access_token'        => $pageData['access_token'], 
+            'token_expires_at'    => now()->addDays(60),
+            'is_active'           => true,
         ]
     );
 
-   
-    $pages = $this->socialService->getUserPages($userToken);
+    $linkedCount++;
+}
 
-    foreach ($pages as $page) {
-        if (Auth::user()->canAddPage()) {
-            Auth::user()->pages()->updateOrCreate(
-                ['page_id' => 'me'], 
-                [
-                    'facebook_account_id' => $account->id,
-                    'page_name' => $page['name'],
-                    'access_token' => $page['access_token'], // توكن الصفحة
-                ]
-            );
+            return redirect()->route('dashboard')->with('success', "تم ربط الحساب وجلب {$linkedCount} صفحات بنجاح.");
+
+        } catch (\Exception $e) {
+            Log::error('Facebook callback error', [
+                'user_id' => Auth::id(), 
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString()
+            ]);
+            return redirect()->route('dashboard')->with('error', 'حدث خطأ أثناء ربط الحساب: ' . $e->getMessage());
         }
     }
-
-    return redirect()->route('dashboard')->with('success', 'تم ربط  الحساب');
-}
 }

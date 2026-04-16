@@ -9,7 +9,7 @@ class CheckSubscription
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->user()->hasPlan()) {
+        if (!auth()->user()->hasActivePlan()) {
             return redirect()->route('plans.index')
                 ->with('error', 'You need to subscribe first');
         }

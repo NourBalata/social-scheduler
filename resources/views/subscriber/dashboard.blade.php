@@ -1,8 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            {{-- <h2 class="font-bold text-2xl text-gray-800">لوحة التحكم</h2> --}}
-
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">أهلاً، {{ auth()->user()->name }}</span>
@@ -26,7 +24,30 @@
 
     <div class="py-8" dir="rtl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
+
+          
+            @if(session('success'))
+                <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-6 border border-green-200">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-6 border border-red-200">
+                     {{ session('error') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="bg-red-100 text-red-700 p-4 rounded-lg mb-6 border border-red-200">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-right">
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 transition hover:shadow-md">
                     <div class="flex items-center justify-between">
@@ -88,36 +109,62 @@
                             </svg>
                             جدولة منشور جديد
                         </h3>
-                        
+
                         <form action="{{ route('posts.store') }}" method="POST" class="space-y-6">
                             @csrf
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                            
-    <label class="block text-sm font-semibold text-gray-700 mb-2">اسم صفحة الفيسبوك</label>
-    <input type="text" 
-           name="page_name" 
-           placeholder="أدخل اسم الصفحة (مثلاً: United Investment)" 
-           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition"
-           required>
-    <span data-field="page_name" class="error-msg text-red-500 text-xs mt-1 hidden"></span>
+                          <div>
+    <label class="block text-sm font-semibold text-gray-700 mb-2 text-right">اسم صفحة الفيسبوك</label>
+    <div class="relative">
+        <input type="text"
+               name="page_name"
+               list="existing_pages"
+               placeholder="اختر من القائمة أو اكتب اسماً"
+               value="{{ old('page_name') }}"
+               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition @error('page_name') border-red-500 @enderror"
+               required>
+        <datalist id="existing_pages">
+            @foreach(auth()->user()->pages as $page)
+                <option value="{{ $page->page_name }}">
+            @endforeach
+        </datalist>
+    </div>
+    <div class="mt-2 text-right">
+        <button type="button" id="openPageModalBtnQuick" class="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center gap-1">
+            <span>+ إضافة صفحة جديدة غير موجودة</span>
+        </button>
+    </div>
 </div>
-                             
 
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">تاريخ ووقت النشر</label>
-                                    <input type="datetime-local" name="scheduled_at" class="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent py-3 transition">
+                                    <input type="datetime-local"
+                                           name="scheduled_at"
+                                           value="{{ old('scheduled_at') }}"
+                                           class="w-full border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent py-3 px-4 transition @error('scheduled_at') border-red-500 @enderror">
+                                    @error('scheduled_at')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">محتوى المنشور</label>
-                                <textarea name="content" rows="4" class="w-full border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition p-4" placeholder="بماذا تفكر؟ اكتب محتوى منشورك هنا..."></textarea>
+                                <textarea name="content"
+                                          rows="4"
+                                          required
+                                          class="w-full border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition p-4 @error('content') border-red-500 @enderror"
+                                          placeholder="بماذا تفكر؟ اكتب محتوى منشورك هنا...">{{ old('content') }}</textarea>
+                                @error('content')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="flex justify-end">
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-200 active:transform active:scale-95 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
                                     تأكيد الجدولة
                                 </button>
                             </div>
@@ -127,4 +174,76 @@
             </div>
         </div>
     </div>
+    {{-- Modal إضافة صفحة جديدة --}}
+<div id="pageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
+        <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-800">إضافة صفحة فيسبوك جديدة</h3>
+            <button id="closePageModalBtn" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form action="{{ route('admin.users.store') }}" method="POST" class="p-6 space-y-4">
+            @csrf
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Page ID</label>
+                <input type="text" name="page_id" placeholder="مثال: 123456789..."
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">اسم الصفحة</label>
+                <input type="text" name="page_name" placeholder="اسم الصفحة..."
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Page Access Token</label>
+                <input type="text" name="page_access_token" placeholder="EAAW..."
+                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+            </div>
+
+            <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                <button type="submit"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                    حفظ الصفحة
+                </button>
+                <button type="button" id="cancelPageModalBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                    إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+     <script>
+
+// Page Modal
+const pageModal = document.getElementById('pageModal');
+const openPageModalBtn = document.getElementById('openPageModalBtnQuick');
+const closePageModalBtn = document.getElementById('closePageModalBtn');
+const cancelPageModalBtn = document.getElementById('cancelPageModalBtn');
+
+openPageModalBtn?.addEventListener('click', () => {
+    pageModal.classList.remove('hidden');
+    pageModal.classList.add('flex');
+});
+
+[closePageModalBtn, cancelPageModalBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+        pageModal.classList.add('hidden');
+        pageModal.classList.remove('flex');
+    });
+});
+
+// إغلاق لما تضغط برا الموديل
+pageModal?.addEventListener('click', (e) => {
+    if (e.target === pageModal) {
+        pageModal.classList.add('hidden');
+        pageModal.classList.remove('flex');
+    }
+});
+</script>
+      
 </x-app-layout>

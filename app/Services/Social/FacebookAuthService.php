@@ -2,44 +2,72 @@
 
 namespace App\Services\Social;
 
-use App\Models\FacebookPage;
+use App\Contracts\SocialMediaProvider;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-class FacebookAuthService
+class FacebookProvider implements SocialMediaProvider
 {
-    /**
-     * مزامنة صفحات فيسبوك الخاصة بالمستخدم
-     */
-    public function syncUserPages(string $userToken)
+    private string $base = 'https://graph.facebook.com/v19.0';
+
+    public function getAuthUrl(): string
     {
-        // 1. طلب قائمة الصفحات (Accounts) من Facebook Graph API
-        $response = Http::get("https://graph.facebook.com/v19.0/me/accounts", [
-            'access_token' => $userToken
+        return 'https://www.facebook.com/v19.0/dialog/oauth?' . http_build_query([
+            'client_id'    => config('services.facebook.client_id'),
+            'redirect_uri' => config('services.facebook.redirect_uri'),
+            'scope'        => 'pages_manage_posts,pages_read_engagement,pages_show_list',
+            'state'        => csrf_token(),
+        ]);
+    }
+
+    public function getAccessToken(string $code): array
+    {
+        $res = Http::get("{$this->base}/oauth/access_token", [
+            'client_id'     => config('services.facebook.client_id'),
+            'client_secret' => config('services.facebook.client_secret'),
+            'redirect_uri'  => config('services.facebook.redirect_uri'),
+            'code'          => $code,
         ]);
 
-        if ($response->failed()) {
-            // في حال فشل الطلب (مثلاً التوكن غلط أو منتهي)
-            return false;
-        }
-
-        $pages = $response->json('data') ?? [];
-
-        foreach ($pages as $page) {
-            // 2. تخزين أو تحديث بيانات الصفحة
-            // استخدمنا updateOrCreate عشان لو الصفحة موجودة نحدث الـ Token تبعها بس
-            FacebookPage::updateOrCreate(
-                ['page_id' => $page['id']],
-                [
-                    // إذا مش مسجل دخول، بنحط ID مؤقت أو 1
-                    'user_id'      => Auth::id() ?? session('temp_user_id', 1),
-                    'name'         => $page['name'],
-                    // هاد هو الـ Page Access Token وهو ضروري جداً للنشر لاحقاً
-                    'access_token' => $page['access_token'], 
-                ]
-            );
-        }
-
-        return true;
+        return $res->json() ?? [];
     }
+
+    public function getUserPages(string $userToken): array
+    {
+        $res = Http::get("{$this->base}/me/accounts", [
+            'access_token' => $userToken,
+            'fields'       => 'id,name,access_token,category',
+        ]);
+
+        return $res->json('data') ?? [];
+    }
+
+public function post(string $token, string $pageId, array $data): string
+{
+    $endpoint = "https://graph.facebook.com/v19.0/{$pageId}/feed";
+    $payload = [
+        'message'      => $data['content'] ?? $data['message'] ?? '',
+        'access_token' => $token,
+    ];
+
+    if (!empty($data['media_url'])) {
+        $type = $data['media_type'] ?? 'image';
+        if ($type === 'image') {
+            $endpoint       = "https://graph.facebook.com/v19.0/{$pageId}/photos";
+            $payload['url'] = $data['media_url'];
+        } elseif ($type === 'video') {
+            $endpoint            = "https://graph.facebook.com/v19.0/{$pageId}/videos";
+            $payload['file_url'] = $data['media_url'];
+        }
+    }
+
+    $response = Http::timeout(30)->post($endpoint, $payload);
+
+    if ($response->failed()) {
+        $msg = $response->json('error.message') ?? $response->body();
+        throw new \Exception("Facebook API Error: " . $msg);
+    }
+
+    return (string) ($response->json('id') ?? $response->json('post_id') ?? '');
+}
 }

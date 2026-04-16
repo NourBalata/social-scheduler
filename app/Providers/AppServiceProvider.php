@@ -1,26 +1,22 @@
 <?php
 
 namespace App\Providers;
+
 use App\Contracts\SocialMediaProvider;
+use App\Models\User;
+use App\Observers\UserObserver;
 use App\Services\Social\FacebookProvider;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-       $this->app->bind(SocialMediaProvider::class, FacebookProvider::class);
-       \App\Models\User::observe(\App\Observers\UserObserver::class);
+        $this->app->bind(SocialMediaProvider::class, FacebookProvider::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        // User::observe(UserObserver::class);
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\FacebookController;
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -12,9 +13,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
 });
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('subscriber/dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-Route::get('/dashboard', [AdminUserController::class, 'index'])
+Route::get('/dashboard/subscriber', [AdminUserController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('subscriber.dashboard');
 Route::middleware('auth')->group(function () {
@@ -26,6 +27,15 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    // Route::get('/auth/facebook', [FacebookController::class, 'redirect'])->name('facebook.redirect');
+    // Route::get('/auth/facebook/callback', [FacebookController::class, 'callback'])->name('facebook.callback');
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/facebook/redirect', [FacebookController::class, 'redirect'])->name('facebook.redirect');
+    Route::get('/facebook/callback', [FacebookController::class, 'callback'])->name('facebook.callback');
 });
 
+Route::post('/pages/store', [App\Http\Controllers\PageController::class, 'store'])
+    ->name('pages.store')
+    ->middleware('auth');
 require __DIR__.'/auth.php';

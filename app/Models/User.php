@@ -12,11 +12,10 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = [
-        'name', 'email', 'password', 'plan_id', 'is_admin', 'plan_expires_at',
-        'fb_client_id', 'fb_client_secret', 'fb_user_id'
-    ];
-
+protected $fillable = [
+    'name', 'email', 'password', 'plan_id', 'is_admin', 'plan_expires_at',
+  'fb_user_id', 'fb_access_token', 
+];
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
@@ -95,4 +94,10 @@ class User extends Authenticatable
 
         return $this->pages()->count() < $this->currentPlan->pages_limit;
     }
+
+    public function facebookPages()
+    {
+
+    return $this->hasMany(\App\Models\FacebookPage::class);
+}
 }

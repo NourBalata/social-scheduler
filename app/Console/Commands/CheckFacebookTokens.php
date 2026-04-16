@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\FacebookPage;
 use Illuminate\Console\Command;
-
+use Illuminate\Support\Facades\Http;
 class CheckFacebookTokens extends Command
 {
     protected $signature = 'fb:check-tokens';
@@ -12,12 +12,12 @@ class CheckFacebookTokens extends Command
 
     public function handle()
     {
-        $this->info('فحص حالة Facebook Tokens');
+        $this->info('فحص Facebook Tokens');
         
         $pages = FacebookPage::with('user')->get();
         
         if ($pages->isEmpty()) {
-            $this->warn('لا توجد صفحات Facebook مربوطة');
+            $this->warn('لا توجد صفحات مرتبطة ');
             return;
         }
 
@@ -27,12 +27,10 @@ class CheckFacebookTokens extends Command
             $this->line("المستخدم: {$page->user->name} ({$page->user->email})");
             
             if (empty($page->access_token)) {
-                $this->error("❌ Token مفقود!");
+                $this->error("Token مفقود!");
             } else {
                 $tokenPreview = substr($page->access_token, 0, 20) . '...';
-                $this->info("✅ Token موجود: {$tokenPreview}");
-                
-                // Check if token is valid
+                $this->info("Token موجود: {$tokenPreview}");
                 $this->checkTokenValidity($page);
             }
         }
@@ -47,13 +45,13 @@ class CheckFacebookTokens extends Command
 
             if ($response->successful()) {
                 $data = $response->json();
-                $this->info("✅ Token صالح - Page ID: {$data['id']}");
+                $this->info(" Token صالح");
             } else {
                 $error = $response->json();
-                $this->error("❌ Token غير صالح: " . ($error['error']['message'] ?? 'Unknown error'));
+                $this->error("Token غير صالح: " . ($error['error']['message'] ?? 'Unknown error'));
             }
         } catch (\Exception $e) {
-            $this->error("❌ خطأ في الفحص: {$e->getMessage()}");
+            $this->error("خطأ في الفحص: {$e->getMessage()}");
         }
     }
 }

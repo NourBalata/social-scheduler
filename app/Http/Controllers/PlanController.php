@@ -11,8 +11,6 @@ class PlanController extends Controller
 {
     
     $plans = Plan::where('active', true)->get();
-
-
     $user = \App\Models\User::first();
 
     $currentPlan = $user?->plan ?? Plan::where('slug', 'free')->first();

@@ -206,15 +206,17 @@
                         ربط حساب فيسبوك
                     </h4>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Facebook User ID</label>
-                            <input type="text" name="fb_user_id" id="fbUserIdInput" placeholder="مثال: 1029384756..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Facebook Access Token</label>
-                            <input type="text" name="fb_access_token" id="fbTokenInput" placeholder="EAAW..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
-                        </div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Page ID</label>
+        <input type="text" name="page_id" placeholder="مثال: 123456789..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">اسم الصفحة</label>
+        <input type="text" name="page_name" placeholder="اسم الصفحة..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
+    <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Page Access Token</label>
+        <input type="text" name="page_access_token" placeholder="EAAW..." class="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 transition text-sm">
+    </div>
                     </div>
                 </div>
             </div>

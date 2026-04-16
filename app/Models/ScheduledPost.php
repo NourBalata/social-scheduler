@@ -34,7 +34,7 @@ class ScheduledPost extends Model
 
     public function facebookPage(): BelongsTo
     {
-        return $this->belongsTo(FacebookPage::class);
+   return $this->belongsTo(FacebookPage::class, 'facebook_page_id');
     }
 
 

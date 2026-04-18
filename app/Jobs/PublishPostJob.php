@@ -31,7 +31,7 @@ class PublishPostJob implements ShouldQueue
           $page = $this->post->facebookPage;
 
             if (!$page || !$page->isTokenValid()) {
-                throw new Exception(" غير صالح.");
+                throw new Exception(" not vaild.");
             }
 
             $fbPostId = $facebookService->post($page->access_token, $page->page_id, [

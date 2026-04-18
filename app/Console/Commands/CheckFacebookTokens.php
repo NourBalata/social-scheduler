@@ -12,25 +12,25 @@ class CheckFacebookTokens extends Command
 
     public function handle()
     {
-        $this->info('فحص Facebook Tokens');
+        $this->info('check token!');
         
         $pages = FacebookPage::with('user')->get();
         
         if ($pages->isEmpty()) {
-            $this->warn('لا توجد صفحات مربوطة ');
+            $this->warn('Not Found pages ');
             return;
         }
 
         foreach ($pages as $page) {
             $this->line('');
-            $this->info("الصفحة: {$page->page_name} (ID: {$page->id})");
-            $this->line("المستخدم: {$page->user->name} ({$page->user->email})");
+            $this->info("page: {$page->page_name} (ID: {$page->id})");
+            $this->line("users: {$page->user->name} ({$page->user->email})");
             
             if (empty($page->access_token)) {
-                $this->error("Token مفقود!");
+                $this->error("Not Found Token!");
             } else {
                 $tokenPreview = substr($page->access_token, 0, 20) . '...';
-                $this->info("Token موجود: {$tokenPreview}");
+                $this->info("Token : {$tokenPreview}");
                 $this->checkTokenValidity($page);
             }
         }
@@ -45,13 +45,13 @@ class CheckFacebookTokens extends Command
 
             if ($response->successful()) {
                 $data = $response->json();
-                $this->info("Token صالح");
+                $this->info("Token usefull");
             } else {
                 $error = $response->json();
-                $this->error(" غير صالح: " . ($error['error']['message'] ?? 'Unknown error'));
+                $this->error("unusefull: " . ($error['error']['message'] ?? 'Unknown error'));
             }
         } catch (\Exception $e) {
-            $this->error("خطأ في الفحص: {$e->getMessage()}");
+            $this->error("Error: {$e->getMessage()}");
         }
     }
 }

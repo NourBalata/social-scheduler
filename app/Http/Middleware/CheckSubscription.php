@@ -11,7 +11,7 @@ class CheckSubscription
     {
         if (!auth()->user()->hasActivePlan()) {
             return redirect()->route('plans.index')
-                ->with('error', 'You need to subscribe first');
+                ->with('error', 'You need subscribe in the first');
         }
 
         return $next($request);

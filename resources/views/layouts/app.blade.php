@@ -14,9 +14,9 @@
         <nav class="bg-white border-b border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <h1 class="text-xl font-bold text-gray-800">لوحة التحكم</h1>
-                    </div>
+<div dir="ltr" class="flex w-full items-center justify-start px-4 py-6">
+    <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h2>
+</div>
                 </div>
             </div>
         </nav>

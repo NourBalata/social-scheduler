@@ -24,7 +24,7 @@ class PostController extends Controller
         if (!$page) {
             return back()
                 ->withInput()
-                ->withErrors(['page_name' => 'غير موجودة الصفحة']);
+                ->withErrors(['page_name' => 'Not dound page']);
         }
 
         $post = ScheduledPost::create([
@@ -35,10 +35,10 @@ class PostController extends Controller
             'status'           => 'pending',
         ]);
 
-        return back()->with('success', "تم.");
+        return back()->with('success', "done.");
     }
 
-public function store2(Request $request)
+public function storeAnotherPage(Request $request)
 {
     $request->validate([
         'page_id'           => 'required|string',
@@ -53,6 +53,6 @@ public function store2(Request $request)
         'token_expires_at' => now()->addDays(60),
     ]);
 
-    return back()->with('success', 'تم.');
+    return back()->with('success', 'done.');
 }
 }

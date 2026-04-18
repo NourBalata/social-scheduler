@@ -14,29 +14,29 @@ class PublishScheduledPosts extends Command
 
     public function handle()
     {
-        $this->info(' فحص المنشورات...');
+        $this->info(' Check post...');
         $now = now();
-        $this->line(" توقيت السيرفر: {$now}");
+        $this->line("time server: {$now}");
 
         $posts = ScheduledPost::where('status', 'pending')
             ->where('scheduled_at', '<=', $now)
             ->with(['facebookPage'])
             ->get();
 
-        $this->info(" المنشورات الجاهزة لنشر : {$posts->count()}");
+        $this->info("Post ready : {$posts->count()}");
 
         if ($posts->isEmpty()) {
-            $this->warn(' لا توجد منشورات لنشر.');
+            $this->warn(' Not found post  .');
             return;
         }
 
         foreach ($posts as $post) {
             $this->line('');
-            $this->info(" معالجة المنشور #{$post->id}");
+            $this->info("  check #{$post->id}");
             $this->publishPost($post);
         }
 
-        $this->info(' انتهت المعالجة.');
+        $this->info(' end check.');
     }
 
     private function publishPost(ScheduledPost $post)
@@ -45,13 +45,13 @@ class PublishScheduledPosts extends Command
             $page = $post->facebookPage;
 
             if (!$page || empty($page->page_id)) {
-                throw new \Exception('لصفحة (Page ID) مفقود ');
+                throw new \Exception('Not found page id ');
             }
 
             $accessToken = $page->access_token;
 
             if (empty($accessToken)) {
-                throw new \Exception('Access Token مفقود ');
+                throw new \Exception('not found token ');
             }
 
             $this->warn("Token Check: " . substr($accessToken, 0, 10) . "...");
@@ -88,15 +88,15 @@ class PublishScheduledPosts extends Command
                     'fb_post_id'   => $fbId,
                 ]);
 
-                $this->info(" تم النشر بنجاح!");
+                $this->info(" Sucessfull!");
             } else {
                 $error = $response->json();
-                $errorMsg = $error['error']['message'] ?? 'خطأ غير معروف  ';
+                $errorMsg = $error['error']['message'] ?? 'not found error   ';
                 throw new \Exception($errorMsg);
             }
 
         } catch (\Exception $e) {
-            $this->error(" فشل النشر: {$e->getMessage()}");
+            $this->error(" falied: {$e->getMessage()}");
             
             $post->update([
                 'status'        => 'failed',

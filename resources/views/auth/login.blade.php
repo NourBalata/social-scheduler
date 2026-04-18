@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>تسجيل الدخول</title>
+    <title>Login | Facebook</title>
     @vite(['resources/css/app.css'])
     <style>
-        /* لون فيس بوك الرسمي */
         :root {
             --fb-blue: #1877F2;
             --fb-blue-hover: #166fe5;
@@ -33,7 +32,7 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-fb tracking-tight">facebook</h1>
-            <p class="text-gray-600 mt-2 text-lg">يسعدنا رؤيتك مرة أخرى</p>
+            <p class="text-gray-600 mt-2 text-lg">We're glad to see you again</p>
         </div>
 
         <div class="bg-white rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.1),0_8px_16px_rgba(0,0,0,0.1)] p-6 md:p-8">
@@ -45,10 +44,10 @@
                     <input 
                         type="email" id="email" name="email" value="{{ old('email') }}" required autofocus 
                         class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-1 focus:ring-fb focus:border-fb outline-none transition-all text-lg @error('email') border-red-500 @enderror"
-                        placeholder="البريد الإلكتروني أو رقم الهاتف"
+                        placeholder="Email or phone number"
                     >
                     @error('email')
-                        <p class="mt-1 text-xs text-red-500 mr-1">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-500 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -56,10 +55,10 @@
                     <input 
                         type="password" id="password" name="password" required 
                         class="w-full px-4 py-3.5 border border-gray-300 rounded-lg focus:ring-1 focus:ring-fb focus:border-fb outline-none transition-all text-lg @error('password') border-red-500 @enderror"
-                        placeholder="كلمة السر"
+                        placeholder="Password"
                     >
                     @error('password')
-                        <p class="mt-1 text-xs text-red-500 mr-1">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-500 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -67,7 +66,7 @@
                     type="submit" id="submitBtn"
                     class="w-full bg-fb hover:bg-[#166fe5] text-white font-bold py-3.5 rounded-lg transition-all text-xl flex items-center justify-center gap-3"
                 >
-                    <span id="btnText">تسجيل الدخول</span>
+                    <span id="btnText">Log In</span>
                     <svg id="btnLoader" class="w-6 h-6 animate-spin hidden" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-20" cx="12" cy="12" r="10" stroke="#000" stroke-width="4"></circle>
                         <path class="opacity-100" fill="#fff" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -77,7 +76,7 @@
                 <div class="text-center pt-2">
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" class="text-sm text-fb hover:underline">
-                            هل نسيت كلمة السر؟
+                            Forgotten password?
                         </a>
                     @endif
                 </div>
@@ -86,7 +85,7 @@
 
                 <div class="text-center">
                     <button type="button" class="bg-[#42b72a] hover:bg-[#36a420] text-white font-bold py-3 px-4 rounded-lg transition-all text-md shadow-sm">
-                        إنشاء حساب جديد
+                        Create new account
                     </button>
                 </div>
             </form>
@@ -94,7 +93,7 @@
 
         <div class="mt-8 text-center px-4">
             <p class="text-gray-500 text-xs">
-                <b>إنشاء صفحة</b> لشخصية مشهورة أو علامة تجارية أو عمل تجاري.
+                <b>Create a Page</b> for a celebrity, brand or business.
             </p>
         </div>
     </div>
@@ -108,7 +107,7 @@
         form.addEventListener('submit', function() {
             submitBtn.disabled = true;
             submitBtn.style.opacity = '0.8';
-            btnText.textContent = 'جاري تسجيل الدخول...';
+            btnText.textContent = 'Logging in...';
             btnLoader.classList.remove('hidden');
         });
     </script>

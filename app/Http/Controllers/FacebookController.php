@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\SocialMediaProvider;
+use App\Contracts\SocialProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -12,7 +12,7 @@ class FacebookController extends Controller
 {
     protected $socialService;
 
-    public function __construct(SocialMediaProvider $socialService)
+    public function __construct(SocialProvider $socialService)
     {
         $this->socialService = $socialService;
     }

@@ -10,7 +10,7 @@ class PostController extends Controller
 {
     public function store(Request $request)
     {
-        //   dd($request->all()); 
+
         $request->validate([
             'page_name'    => 'required|string',
             'content'      => 'required|string',

@@ -10,26 +10,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 class AdminUserController extends Controller
 {
-    // public function index()
-    // {
-    //     $users = User::where('is_admin', false)->with('currentPlan')->get();
-    //     $plans = Plan::where('active', true)->get();
-        
-    //     return view('admin.dashboard', compact('users', 'plans'));
-    // }
+
     public function index()
 {
     $user = auth()->user();
 
   
     if ($user->is_admin) {
-        $users = \App\Models\User::where('is_admin', false)->get();
+       $users = User::with('plan')->where('is_admin', 0)->get();
         $plans = \App\Models\Plan::all();
         
         return view('admin.dashboard', compact('users', 'plans'));
     }
     else{
-           $pages = auth()->user()->facebookPages; 
+         $pages = auth()->user()->facebookPages;
     
     return view('subscriber.dashboard', compact('pages'));
     }
@@ -71,34 +65,11 @@ if ($request->filled('page_id') && $request->filled('page_access_token')) {
         return response()->json([
             'success' => true,
             'user' => $user,
-            'plan_name' => $user->currentPlan?->name ?? 'no plan'
+            'plan_name' => $user->currentPlan?->name ?? 'no plan!'
         ]);
     }
 
-    return back()->with('success', 'تمت الإضافة');
+    return back()->with('success', 'Added!!');
 }
-//     public function store(Request $request)
-//     {
-//         $request->validate([
-//             'name' => 'required|string|max:255',
-//             'email' => 'required|email|unique:users,email',
-//             'password' => 'required|min:8',
-//             'plan_id' => 'required|exists:plans,id',
-//             'fb_client_id' => 'nullable|string',
-//             'fb_client_secret' => 'nullable|string',
-//         ]);
 
-//         User::create([
-//             'name' => $request->name,
-//             'email' => $request->email,
-//             'password' => Hash::make($request->password),
-//        'plan_id' => $request->plan_id,
-//             'fb_client_id' => $request->fb_client_id,
-//             'fb_client_secret' => $request->fb_client_secret,
-//             'is_admin' => false, //
-//         ]);
-// // dd($request->plan_id);
-// dd($request->all());
-//         return back()->with('success', 'تم إضافة المشترك بنجاح!');
-//     }
 }

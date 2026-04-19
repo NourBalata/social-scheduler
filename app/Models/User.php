@@ -100,4 +100,10 @@ protected $fillable = [
 
     return $this->hasMany(\App\Models\FacebookPage::class);
 }
+
+
+public function plan()
+{
+    return $this->belongsTo(\App\Models\Plan::class);
+}
 }

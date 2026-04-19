@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Contracts\SocialMediaProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class FacebookController extends Controller
 {
@@ -24,86 +24,126 @@ class FacebookController extends Controller
 
     public function callback(Request $request)
     {
+
         if ($request->has('error')) {
-            return redirect()->route('dashboard')->with('error', 'not access!');
+            Log::warning('Facebook authorization denied', [
+                'user_id' => Auth::id(),
+                'error' => $request->get('error_description', $request->get('error'))
+            ]);
+            
+            return redirect()->route('dashboard')
+                ->with('error', 'Facebook authorization was denied.');
+        }
+
+  
+        if (!$request->has('code')) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Invalid authorization response.');
         }
 
         try {
-
+           
             $tokenData = $this->socialService->getAccessToken($request->code);
 
-        dd($tokenData);
             if (empty($tokenData['access_token'])) {
-                return redirect()->route('dashboard')->with('error', ' Access Token.');
+                throw new \Exception('Failed to obtain access token from Facebook.');
             }
 
             $shortToken = $tokenData['access_token'];
 
-          
-            $longRes = Http::get('https://graph.facebook.com/v18.0/oauth/access_token', [
-                'grant_type'        => 'fb_exchange_token',
-                'client_id'         => config('services.facebook.client_id'),
-                'client_secret'     => config('services.facebook.client_secret'),
-                'fb_exchange_token' => $shortToken,
-            ]);
+  
+            $longLivedToken = $this->socialService->getLongLivedToken($shortToken);
+            $userToken = $longLivedToken['access_token'];
 
-            $userToken = $longRes->successful() 
-                ? ($longRes->json('access_token') ?? $shortToken) 
-                : $shortToken;
 
-      
-            $account = Auth::user()->facebookAccounts()->updateOrCreate(
-                ['facebook_id' => $tokenData['user_id'] ?? null],
-                [
-                    'name'             => 'Facebook User',
-                    'access_token'     => $userToken,
-                    'token_expires_at' => now()->addDays(60),
-                ]
-            );
+            DB::beginTransaction();
 
-            $pages = $this->socialService->getUserPages($userToken);
+            try {
+             
+                $account = Auth::user()->facebookAccounts()->updateOrCreate(
+                    ['facebook_id' => $tokenData['user_id'] ?? null],
+                    [
+                        'name'             => $tokenData['name'] ?? 'Facebook User',
+                        'access_token'     => encrypt($userToken), 
+                        'token_expires_at' => $longLivedToken['expires_at'],
+                    ]
+                );
 
-            if (empty($pages)) {
-                return redirect()->route('dashboard')->with('warning', 'done but not found pages');
+                $pages = $this->socialService->getUserPages($userToken);
+
+                if (empty($pages)) {
+                    DB::commit(); 
+                    
+                    return redirect()->route('dashboard')
+                        ->with('warning', 'Facebook account connected, but no pages were found.');
+                }
+
+                $linkedCount = 0;
+                $user = Auth::user();
+
+ 
+                foreach ($pages as $pageData) {
+                    if (empty($pageData['id']) || empty($pageData['access_token'])) {
+                        Log::warning('Skipping page with missing data', [
+                            'page_data' => $pageData
+                        ]);
+                        continue;
+                    }
+
+                    \App\Models\FacebookPage::updateOrCreate(
+                        [
+                            'page_id' => (string) $pageData['id'],
+                            'user_id' => $user->id,
+                        ],
+                        [
+                            'page_name'           => $pageData['name'],
+                            'facebook_account_id' => $account->id,
+                            'access_token'        => encrypt($pageData['access_token']),
+                            'token_expires_at'    => now()->addDays(60),
+                            'is_active'           => true,
+                        ]
+                    );
+
+                    $linkedCount++;
+                }
+
+                DB::commit();
+
+                Log::info('Facebook pages connected successfully', [
+                    'user_id' => $user->id,
+                    'pages_count' => $linkedCount
+                ]);
+
+            
+                return redirect()->route('dashboard')
+                    ->with('success', "{$linkedCount} Facebook page connected successfully.");
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
 
-            $user = Auth::user();
-            $linkedCount = 0;
-
-
-// dd($pages);
-
-foreach ($pages as $pageData) {
-    if (empty($pageData['id']) || empty($pageData['access_token'])) {
-        continue;
-    }
-
-    \App\Models\FacebookPage::updateOrCreate(
-        [
-            'page_id' => (string) $pageData['id'],
-            'user_id' => $user->id,
-        ], 
-        [
-            'page_name'           => $pageData['name'],
-            'facebook_account_id' => $account->id,
-            'access_token'        => $pageData['access_token'], 
-            'token_expires_at'    => now()->addDays(60),
-            'is_active'           => true,
-        ]
-    );
-
-    $linkedCount++;
-}
-
-            return redirect()->route('dashboard')->with('success', "done .");
+        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
+      
+            Log::error('Facebook API error', [
+                'user_id' => Auth::id(),
+                'error'   => $e->getMessage(),
+                'code'    => $e->getCode()
+            ]);
+            
+            return redirect()->route('dashboard')
+                ->with('error', 'Facebook API error. Please try again.');
 
         } catch (\Exception $e) {
+          
             Log::error('Facebook callback error', [
-                'user_id' => Auth::id(), 
+                'user_id' => Auth::id(),
                 'error'   => $e->getMessage(),
                 'trace'   => $e->getTraceAsString()
             ]);
-            return redirect()->route('dashboard')->with('error', 'Error : ' . $e->getMessage());
+            
+            return redirect()->route('dashboard')
+                ->with('error', ' error while connecting to Facebook. Please try again.');
         }
     }
 }

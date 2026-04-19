@@ -7,11 +7,10 @@ use Illuminate\Notifications\Notifiable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class User extends Authenticatable
 {
     use Notifiable;
-    use HasFactory;
 
 protected $fillable = [
     'name', 'email', 'password', 'plan_id', 'is_admin', 'plan_expires_at',

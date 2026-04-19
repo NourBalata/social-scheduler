@@ -10,11 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
-    }
+
+{
+    Schema::table('users', function (Blueprint $table) {
+        if (!Schema::hasColumn('users', 'fb_user_id')) {
+            $table->string('fb_user_id')->nullable()->after('password');
+        }
+        
+        if (!Schema::hasColumn('users', 'fb_access_token')) {
+            $table->text('fb_access_token')->nullable()->after('fb_user_id');
+        }
+    });
+}
+    
 
     /**
      * Reverse the migrations.

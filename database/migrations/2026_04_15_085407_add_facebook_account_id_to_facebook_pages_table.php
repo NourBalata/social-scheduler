@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('facebook_pages', function (Blueprint $table) {
-$table->foreignId('facebook_account_id')->after('user_id')->nullable()->constrained('facebook_accounts')->cascadeOnDelete();
+$table->foreignId('facebook_account_id')
+                  ->after('user_id') // يضعه بعد عمود user_id لترتيب الجدول
+                  ->nullable()       // نضعه nullable مؤقتاً إذا كان هناك بيانات قديمة
+                  ->constrained('facebook_accounts')
+                  ->cascadeOnDelete();
         });
     }
 

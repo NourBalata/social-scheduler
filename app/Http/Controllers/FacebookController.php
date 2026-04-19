@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\SocialProvider;
+use App\Contracts\SocialMediaProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -12,7 +12,7 @@ class FacebookController extends Controller
 {
     protected $socialService;
 
-    public function __construct(SocialProvider $socialService)
+    public function __construct(SocialMediaProvider $socialService)
     {
         $this->socialService = $socialService;
     }
@@ -32,14 +32,14 @@ class FacebookController extends Controller
 
             $tokenData = $this->socialService->getAccessToken($request->code);
 
-        // dd($tokenData);
+        dd($tokenData);
             if (empty($tokenData['access_token'])) {
                 return redirect()->route('dashboard')->with('error', 'فشل  Access Token.');
             }
 
             $shortToken = $tokenData['access_token'];
 
-     
+            // 2. تحويل التوكن لـ long-lived token (60 يوم) لضمان عدم توقفه فجأة
             $longRes = Http::get('https://graph.facebook.com/v18.0/oauth/access_token', [
                 'grant_type'        => 'fb_exchange_token',
                 'client_id'         => config('services.facebook.client_id'),
@@ -64,7 +64,7 @@ class FacebookController extends Controller
             $pages = $this->socialService->getUserPages($userToken);
 
             if (empty($pages)) {
-                return redirect()->route('dashboard')->with('warning', 'تم  ولا صفحات');
+                return redirect()->route('dashboard')->with('warning', 'تم لكن لا توجد صفحات');
             }
 
             $user = Auth::user();
